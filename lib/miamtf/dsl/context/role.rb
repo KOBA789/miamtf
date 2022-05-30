@@ -4,7 +4,7 @@ class Miamtf::DSL::Context::Role
     @assume_role_policy_document = nil
     @max_session_duration = nil
     @attached_managed_policies = []
-    @policies = []
+    @policies = {}
     instance_eval(&block)
   end
 

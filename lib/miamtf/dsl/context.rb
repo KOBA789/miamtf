@@ -1,11 +1,12 @@
 class Miamtf::DSL::Context
   def self.eval(source, path)
-    self.new do
+    self.new(path) do
       eval(source, binding, path)
     end
   end
 
-  def initialize(&block)
+  def initialize(path, &block)
+    @path = path
     @roles = {}
     @policies = {}
     @instance_profiles = {}
@@ -30,6 +31,20 @@ class Miamtf::DSL::Context
   end
 
   private
+
+  def require(file)
+    original_path = File.expand_path(file, File.dirname(@path))
+    candidates = [
+      original_path,
+      original_path + ".rb",
+    ]
+    path = candidates.find {|path| File.exist?(path) }
+    if path
+      instance_eval(File.read(path), path)
+    else
+      Kernel.require(file)
+    end
+  end
 
   def role(name, **role_options, &block)
     name = name.to_s
