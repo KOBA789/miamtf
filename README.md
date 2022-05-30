@@ -26,3 +26,18 @@ $ miamtf > iam.tf.json
 ## Acknowledgement
 
 miamtf is highly inspired by [miam](https://github.com/codenize-tools/miam).
+
+## TODO
+
+- [ ] Tests
+- [ ] Documents
+- Resources
+  - [x] Role
+  - [x] Managed Policy
+  - [x] Instance Profile
+  - [ ] User
+  - [ ] Group
+
+## Contribution
+
+日本語で OK
