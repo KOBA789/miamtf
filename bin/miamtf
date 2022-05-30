@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+$: << File.expand_path("#{File.dirname __FILE__}/../lib")
+require 'rubygems'
+require 'json'
+require 'miamtf'
+
+Version = Miamtf::VERSION
+DEFAULT_FILENAME = 'IAMfile'
+
+file = DEFAULT_FILENAME
+
+open(file) do |f|
+  puts JSON::pretty_generate(Miamtf::DSL::Context.eval(f.read, file).to_h)
+end
