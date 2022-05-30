@@ -2,12 +2,19 @@
 $: << File.expand_path("#{File.dirname __FILE__}/../lib")
 require 'rubygems'
 require 'json'
+require 'optparse'
 require 'miamtf'
+
+opt = OptionParser.new
 
 Version = Miamtf::VERSION
 DEFAULT_FILENAME = 'IAMfile'
-
 file = DEFAULT_FILENAME
+
+ARGV.options do |opt|
+  opt.on('-f', '--file FILE') {|v| file = v}
+  opt.parse!
+end
 
 open(file) do |f|
   puts JSON::pretty_generate(Miamtf::DSL::Context.eval(f.read, file).to_h)
