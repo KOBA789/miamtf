@@ -22,13 +22,14 @@ ARGV.options do |opt|
 end
 
 files.each do |file|
-  rb_source = File.read(file)
-  dirname = File.dirname(file)
-  Dir.chdir(dirname)
-  json = JSON::pretty_generate(Miamtf::DSL::Context.eval(rb_source, File.expand_path(file)).to_h)
-  if output.nil?
-    puts json
-  else
-    File.write(output, json)
+  fullpath = File.expand_path(file)
+  rb_source = File.read(fullpath)
+  Dir.chdir(File.dirname(file)) do
+    json = JSON::pretty_generate(Miamtf::DSL::Context.eval(rb_source, fullpath).to_h)
+    if output.nil?
+      puts json
+    else
+      File.write(output, json)
+    end
   end
 end
