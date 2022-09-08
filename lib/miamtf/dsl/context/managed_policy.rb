@@ -7,7 +7,7 @@ class Miamtf::DSL::Context::ManagedPolicy
   def to_h
     {
       name: @name,
-      policy: @policy,
+      policy: @policy.to_json,
     }
   end
 end
