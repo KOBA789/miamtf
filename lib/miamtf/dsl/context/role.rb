@@ -46,7 +46,7 @@ class Miamtf::DSL::Context::Role
     @policies[name] = yield
   end
 
-  def tags
-    @tags = yield
+  def tags(tags)
+    @tags = tags
   end
 end
