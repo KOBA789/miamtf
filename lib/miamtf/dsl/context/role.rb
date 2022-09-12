@@ -5,6 +5,7 @@ class Miamtf::DSL::Context::Role
     @max_session_duration = nil
     @attached_managed_policies = []
     @policies = {}
+    @tags = {}
     instance_eval(&block)
   end
 
@@ -22,6 +23,7 @@ class Miamtf::DSL::Context::Role
       inline_policy: inline_policy,
       managed_policy_arns: @attached_managed_policies,
       max_session_duration: @max_session_duration,
+      tags: @tags,
     }
   end
 
@@ -42,5 +44,9 @@ class Miamtf::DSL::Context::Role
     name = name.to_s
 
     @policies[name] = yield
+  end
+
+  def tags
+    @tags = yield
   end
 end
