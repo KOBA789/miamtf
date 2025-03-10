@@ -10,6 +10,10 @@ class Miamtf::DSL::Context
     @roles = {}
     @policies = {}
     @instance_profiles = {}
+    @role_policy_attachments = {}
+    @role_policy_attachments_exclusive = {}
+    @role_inline_policies = {}
+    @role_inline_policies_exclusive = {}
 
     instance_eval(&block)
   end
@@ -25,6 +29,15 @@ class Miamtf::DSL::Context
     unless @instance_profiles.empty?
       resource[:aws_iam_instance_profile] = @instance_profiles
     end
+    unless @role_policy_attachments.empty?
+      resource[:aws_iam_role_policy_attachment] = @role_policy_attachments
+      resource[:aws_iam_role_policy_attachments_exclusive] = @role_policy_attachments_exclusive
+    end
+    unless @role_inline_policies.empty?
+      resource[:aws_iam_role_policy] = @role_inline_policies
+      resource[:aws_iam_role_policies_exclusive] = @role_inline_policies_exclusive
+    end
+      
     {
       resource: resource
     }
@@ -50,7 +63,22 @@ class Miamtf::DSL::Context
     name = name.to_s
 
     role = Role.new(name, &block)
+
     @roles[name] = role_options.merge(role.to_h)
+
+    @role_policy_attachments.merge!(role.role_policy_attachment_resources)
+    @role_policy_attachments_exclusive[name] = {
+      role_name: "aws_iam_role.#{name}.name",
+      policy_arns: role.attached_managed_policy_arns
+        .map {|policy_arn| policy_arn.sub("arn:aws:iam::aws:policy/", '').tr("/", "_")}
+        .map {|policy_name| "aws_iam_role_policy_attachment.#{name}_#{policy_name}.policy_arn"},
+    }
+
+    @role_inline_policies.merge!(role.role_policy_resources)
+    @role_inline_policies_exclusive[name] = {
+      role_name: "aws_iam_role.#{name}.name",
+      policy_names: role.inline_policy_names.map {|policy_name| "aws_iam_role_policy.#{name}_#{policy_name}.name"},
+    }
   end
 
   def instance_profile(name, **instance_profile_options)
