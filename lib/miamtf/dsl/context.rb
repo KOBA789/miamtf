@@ -15,19 +15,20 @@ class Miamtf::DSL::Context
   end
 
   def to_h
-    resource = {}
-    unless @roles.empty?
-      resource[:aws_iam_role] = @roles
-    end
-    unless @policies.empty?
-      resource[:aws_iam_policy] = @policies
-    end
-    unless @instance_profiles.empty?
-      resource[:aws_iam_instance_profile] = @instance_profiles
-    end
-    {
-      resource: resource
+    aux_tf = JSON.load_file(
+      File.join(File.dirname(__FILE__), '../aux.tf.json')
+    )
+
+    model = Miamtf::Model::Root.new(
+      roles: @roles,
+      managed_policies: @policies,
+      instance_profiles: @instance_profiles,
+    )
+    locals = {
+      miamtf: model.to_h
     }
+
+    aux_tf.merge(locals: locals)
   end
 
   private
@@ -49,22 +50,26 @@ class Miamtf::DSL::Context
   def role(name, **role_options, &block)
     name = name.to_s
 
-    role = Role.new(name, &block)
-    @roles[name] = role_options.merge(role.to_h)
+    role = Role.new(&block)
+    @roles[name] = Miamtf::Model::Role::new(
+      role_options.merge(role.to_h)
+    )
   end
 
   def instance_profile(name, **instance_profile_options)
     name = name.to_s
 
-    @instance_profiles[name] = instance_profile_options
-      .merge(name: name)
-      .merge(instance_profile_options)
+    @instance_profiles[name] = Miamtf::Model::InstanceProfile.new(
+      instance_profile_options
+    )
   end
 
   def managed_policy(name, **policy_options, &block)
     name = name.to_s
 
-    managed_policy = ManagedPolicy.new(name, &block)
-    @policies[name] = policy_options.merge(managed_policy.to_h)
+    managed_policy = ManagedPolicy.new(&block)
+    @policies[name] = Miamtf::Model::ManagedPolicy.new(
+      policy_options.merge(managed_policy.to_h)
+    )
   end
 end

@@ -1,5 +1,6 @@
 module Miamtf; end
 require "miamtf/version"
+require "miamtf/model"
 require "miamtf/dsl"
 require "miamtf/dsl/context"
 require "miamtf/dsl/context/role"

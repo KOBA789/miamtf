@@ -1,6 +1,5 @@
 class Miamtf::DSL::Context::Role
-  def initialize(name, &block)
-    @role_name = name
+  def initialize(&block)
     @assume_role_policy_document = nil
     @max_session_duration = nil
     @attached_managed_policies = []
@@ -10,17 +9,9 @@ class Miamtf::DSL::Context::Role
   end
 
   def to_h
-    inline_policy = @policies.map do |name, document|
-      {
-        name: name,
-        policy: document.to_json,
-      }
-    end
-
     {
-      name: @role_name,
-      assume_role_policy: @assume_role_policy_document.to_json,
-      inline_policy: inline_policy,
+      assume_role_policy: @assume_role_policy_document,
+      inline_policies: @policies,
       managed_policy_arns: @attached_managed_policies,
       max_session_duration: @max_session_duration,
       tags: @tags,
