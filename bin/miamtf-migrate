@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+$: << File.expand_path("#{File.dirname __FILE__}/../lib")
+require 'rubygems'
+require 'json'
+require 'miamtf'
+
+Version = Miamtf::VERSION
+
+tf = JSON.parse(STDIN.read, symbolize_names: true)
+local = tf[:locals][:miamtf]
+
+# The feature to migrate is very adhoc and not well defined.
+roles = local[:roles]
+policies = local[:managed_policies]
+instance_profiles = local[:instance_profiles]
+
+moved_roles = roles.keys.map do |role_name|
+  <<~HCL
+  moved {
+    from = aws_iam_role.#{role_name}
+    to   = aws_iam_role.miamtf["#{role_name}"]
+  }
+  HCL
+end
+moved_policies = policies.keys.map do |policy_name|
+  <<~HCL
+  moved {
+    from = aws_iam_policy.#{policy_name}
+    to   = aws_iam_policy.miamtf["#{policy_name}"]
+  }
+  HCL
+end
+moved_instance_profiles = instance_profiles.keys.map do |instance_profile_name|
+  <<~HCL
+  moved {
+    from = aws_iam_instance_profile.#{instance_profile_name}
+    to   = aws_iam_instance_profile.miamtf["#{instance_profile_name}"]
+  }
+  HCL
+end
+
+content = (moved_roles + moved_policies + moved_instance_profiles).join("\n")
+
+STDOUT.puts content

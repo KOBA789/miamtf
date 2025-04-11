@@ -1,13 +1,11 @@
 class Miamtf::DSL::Context::ManagedPolicy
-  def initialize(name, &block)
-    @policy_name = name
+  def initialize(&block)
     @policy = instance_eval(&block)
   end
 
   def to_h
     {
-      name: @policy_name,
-      policy: @policy.to_json,
+      policy_document: @policy,
     }
   end
 end
