@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "miamtf" {
 
   # implicit
   name = each.value.policy_name
-  role = each.value.role_name
+  role = aws_iam_role.miamtf[each.value.role_name].name
 
   # required
   policy = jsonencode(each.value.policy_document)
@@ -44,7 +44,7 @@ resource "aws_iam_role_policies_exclusive" "miamtf" {
   for_each = local.miamtf.roles
 
   # implicit
-  role_name = each.key
+  role_name = aws_iam_role.miamtf[each.key].name
 
   # required
   policy_names = keys(each.value.inline_policies)
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "miamtf" {
   }
 
   # implicit
-  role = each.value.role_name
+  role = aws_iam_role.miamtf[each.value.role_name].name
 
   # required
   policy_arn = each.value.policy_arn
@@ -73,7 +73,7 @@ resource "aws_iam_role_policy_attachments_exclusive" "miamtf" {
   for_each = local.miamtf.roles
 
   # implicit
-  role_name = each.key
+  role_name = aws_iam_role.miamtf[each.key].name
 
   # required
   policy_arns = each.value.managed_policy_arns
